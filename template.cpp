@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <memory>
 #include <cstring>
+#include <cmath>
 #include <stack>
 #include <queue>
 #include <assert.h>
@@ -43,6 +44,7 @@ vector<string> split(string str, string delim)
 #define PF(...) printf(__VA_ARGS__)
 #define TOI(s, var) sscanf((s).c_str(), "%d", &(var))
 #define TOD(s, var) sscanf((s).c_str(), "%lf", &(var))
+#define POW2(x) ((x) * (x))
 
 namespace L { /* List */
 template <typename T>
