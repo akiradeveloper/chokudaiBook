@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <memory>
 #include <cstring>
+#include <cmath>
 #include <stack>
 #include <queue>
 #include <assert.h>
@@ -118,49 +119,130 @@ namespace S { /* Set */
 
 /* end of template */
 
-class AutoLoan {
+#define POW2(x) ((x) * (x))
+
+class CirclesCountry {
 	public:
-	double interestRate(double price, double monthlyPayment, int loanTerm)
+	int N;
+	int levelTab[51];		
+	bool inclusionTab[51][51];
+	vector<int> mX, mY, mR;
+
+	// ! includes 2
+	bool includeC(int X1, int Y1, int R1, int X2, int Y2, int R2)
 	{
-		double a = 0;
-		double b = 100;
-		double c;
-		int i;
-		IT(i, 1000){
-			c = (a + b) / 2;	
-			int term = calcTerm(price, monthlyPayment, c);	
-			// P(c);
-			// P(term);
-			if(term > loanTerm){
-				b = c;
-			}else{
-				a = c;
-			}
-		}
-		return c;
+		bool apart = sqrt( POW2(X1-X2) + POW2(Y1-Y2) ) > (R1 + R2);
+		return !apart && (R1 >= R2);
 	}
 
-	int calcTerm(double price, double payM, double rate)
+	bool include(int X, int Y, int R, int x, int y)
 	{
-		double prices[1000];
-		prices[0] = price;
-		int i;
-		for(i=1; i<1000; i++){
-			prices[i] = prices[i-1] * (1+rate/12/100) - payM;
-			// P(prices[i-1]);
-			// P(prices[i]);
+		return sqrt( POW2(X-x) + POW2(Y-y) ) < R;
+	}
 
-			if(prices[i] < 0){
-				return i;
+	int circleID(int x, int y)
+	{
+		int level = -1;
+		int ID = -1;
+		int i;
+		IT(i, N){
+			if(include(mX[i], mY[i], mR[i], x, y)){
+				if(levelTab[i] > level){
+					level = levelTab[i];
+					ID = i;
+				}
 			}
 		}
+		assert(ID != -1);
+		return ID;
+	}
+
+	int leastBorders(vector<int> X, vector<int> Y, vector<int> R, int x1, int y1, int x2, int y2)
+	{
+
+		/*
+		 * Nested Set Model.
+		 */
+
+		int i, j;
+
+		mX=X; mY=Y; mR=R;
+
+		mX.push_back(5000);
+		mY.push_back(5000);
+		mR.push_back(100000);
+		N = mX.size();
+
+		IT(i, N) { IT(j, N) inclusionTab[i][j] = false; }
+
+		P("start set inclusion tab");
+		IT(i, N){
+			IT(j, N){
+				bool in = includeC(mX[j], mY[j], mR[j], mX[i], mY[i], mR[i]);
+				if(in){
+					if(i==8){
+						P(i); P(j);
+					}
+					inclusionTab[i][j] = true;
+				}
+			}
+		}
+		P("set inclusion tab");
+
+		IT(i, N){
+			int n = 0;
+			IT(j, N){
+				if(inclusionTab[i][j]) n++;
+			}
+			levelTab[i] = n;
+			P(n);
+		}
+		P("set level tab");
+
+		// deeepst circle the point is included.
+		int ID1 = circleID(x1, y1);
+		int ID2 = circleID(x2, y2);	
+		P(ID1); P(ID2);
+		P(levelTab[ID1]);
+		P(levelTab[ID2]);
+
+		vector<int> commonParent;
+		IT(j, N){
+			if(inclusionTab[ID1][j] && inclusionTab[ID2][j]){
+				commonParent.push_back(j);
+			}
+		}
+		L::show(commonParent);
+
+		// search the deepest parent 
+		int ID = -1; 
+		int level = -1;
+		IT(i, commonParent.size()){
+			int id = commonParent[i];
+			if(levelTab[id] > level){
+				level = levelTab[id];
+				ID = id;
+			}
+		}
+		assert(ID != -1);
+		P(level);
+
+		return (levelTab[ID1] - level) + (levelTab[ID2] - level);
 	}
 };
 
 int main(void){
-	AutoLoan a = AutoLoan();
-	// P(a.calcTerm(100, 10, 1));
-	P(a.interestRate(6800, 100, 68));
-	P(a.interestRate(2000, 510, 4));
+
+	CirclesCountry c = CirclesCountry();
+
+	P(c.include(0, 0, 3, 1, 0));
+	P(c.include(0, 0, 3, 3, 2));
+
+	int _X[8] = {-3, 2, 2, 0, -4, 12, 12, 12}; vector<int> X(_X, _X+8);
+	int _Y[8] = {-1, 2, 3, 1, 5, 1, 1, 1}; vector<int> Y(_Y, _Y+8);
+	int _R[8] = {1, 3, 1, 7, 1, 1, 2, 3}; vector<int> R(_R, _R+8);
+
+	P(c.leastBorders(X, Y, R, 2, 3, 13, 2));
+
 	return 0;
-};
+}
