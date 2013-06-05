@@ -37,7 +37,10 @@ vector<string> split(string str, string delim)
 }
 };
 
-#define IT(i, size) for(i=0; i<(size); i++)
+#define MP make_pair
+#define ALL(v) v.begin(), v.end()
+#define REP(i, n) for(unsigned long long i=0; i<(n); i++)
+#define REP2(i, from, to) for(long long i=(from); i<=(to); i++)
 #define SIGN(n) (n==0?0:(n>0 ? 1 : -1))
 #define ABS(n) ((n)<0?(-(n)):(n))
 #define P(x) { cout << x << endl; }
@@ -45,6 +48,9 @@ vector<string> split(string str, string delim)
 #define TOI(s, var) sscanf((s).c_str(), "%d", &(var))
 #define TOD(s, var) sscanf((s).c_str(), "%lf", &(var))
 #define POW2(x) ((x) * (x))
+#define IT(i, size) for(i=0; i<(size); i++) /* obsolete */
+
+typedef long long ll;
 
 namespace L { /* List */
 template <typename T>
@@ -126,7 +132,7 @@ int main(void){
 	vector<int> v(x, x+3);
 	L::show(v);
 
-	int max_value = *std::max_element(v.begin(), v.end());
+	int max_value = *std::max_element(ALL(v));
 	P(max_value);
 	int i;
 	string s0("10");
@@ -145,12 +151,15 @@ int main(void){
 	vector<pair<string, int> > p = M::toList(m);
 	PL::show(p);
 
-	stable_sort(p.begin(), p.end(), PL::comp_by_value<string, int>);
+	stable_sort(ALL(p), PL::comp_by_value<string, int>);
 	PL::show(p);
 
 	vector<pair<int, string> > r = PL::flip(p);
 	PL::show(r);
 	PL::show(PL::flip(p));
+
+	REP(k, 3) P(k);
+	REP2(z, -1, 2) P(z);
 	
 	return 0;
 }
