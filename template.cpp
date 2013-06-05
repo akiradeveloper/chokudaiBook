@@ -2,21 +2,24 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <bitset>
 #include <map>
 #include <algorithm>
 #include <cstdlib>
 #include <memory>
-#include <cstring>
-#include <cmath>
+#include <utility>
 #include <stack>
 #include <queue>
 #include <assert.h>
-using namespace std;
+#include <climits>
+#include <cmath>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
+#include <ctime>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/time.h>
+using namespace std;
 
 namespace String {
 vector<string> split(string str, string delim)
@@ -49,6 +52,11 @@ vector<string> split(string str, string delim)
 #define TOD(s, var) sscanf((s).c_str(), "%lf", &(var))
 #define POW2(x) ((x) * (x))
 #define IT(i, size) for(i=0; i<(size); i++) /* obsolete */
+
+#define mk_vector(name, type, ...) \
+	const int n = sizeof( (type[]){__VA_ARGS__} ) / sizeof( type );\
+	type ___name___[n] = {__VA_ARGS__};\
+	vector<type> name(___name___, ___name___ + n);
 
 typedef long long ll;
 
@@ -128,8 +136,10 @@ namespace S { /* Set */
 
 /* Test */
 int main(void){
-	int x[3] = { 1, 2, -1 };
-	vector<int> v(x, x+3);
+	//int x[3] = { 1, 2, -1 };
+	//vector<int> v(x, x+3);
+	mk_vector(v, int, 1, 2, -1);
+	//vector<int> v = {1,2,-1};	
 	L::show(v);
 
 	int max_value = *std::max_element(ALL(v));
