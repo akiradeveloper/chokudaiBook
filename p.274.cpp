@@ -61,12 +61,6 @@ vector<string> split(string str, string delim)
 }
 };
 
-namespace Array {
-};
-
-namespace T { /* Table */
-}
-
 namespace L { /* List */
 template <typename T>
 void show(const vector<T>& v)
@@ -88,7 +82,7 @@ vector<pair<V, K> > flip(const vector<pair<K, V> >& v)
 	int i;
 	IT(i, v.size()){
 		pair<K, V> p = v[i];
-		r.push_back(MP(p.second, p.first));
+		r.push_back(make_pair(p.second, p.first));
 	}
 	return r;
 }
@@ -112,14 +106,14 @@ bool comp_by_value(const pair<K, V>& p1, const pair<K, V>& p2)
 }
 };
 
-namespace Map { /* Map */
+namespace M { /* Map */
 template <typename K, typename V>
 vector<pair<K, V> > toList(map<K, V>& m)
 {
 	vector<pair<K, V> > v;
 	typename map<K, V>::iterator it;
 	for(it = m.begin(); it != m.end(); ++it){
-		v.push_back(MP(it->first, it->second));
+		v.push_back(make_pair(it->first, it->second));
 	}
 	return v;
 }
@@ -129,7 +123,7 @@ vector<pair<K, V> > find(map<K, V>& m, K key)
 	vector<pair<K, V> > v;
 	typename map<K, V>::iterator it = m.find(key);
 	for(it = m.begin(); it != m.end(); ++it){
-		v.push_back(MP(it->first, it->second));
+		v.push_back(make_pair(it->first, it->second));
 	}
 	P(v.size());
 	return v;
@@ -139,50 +133,99 @@ vector<pair<K, V> > find(map<K, V>& m, K key)
 namespace S { /* Set */
 };
 
-namespace Queue { /* Queue */
-};
-
-namespace Stack { /* Stack */
-};
-
 /* end of template */
 
-/* Test */
-int main(void){
-	//int x[3] = { 1, 2, -1 };
-	//vector<int> v(x, x+3);
-	mk_vector(v, int, 1, 2, -1);
-	//vector<int> v = {1,2,-1}; // C++0x
-	L::show(v);
+bool visited[50] = {false};
+int connect[50] = {0};
+bool t[50][50] = {false};
+int nr_grp = 0; 
+int nr_free = 0;
 
-	int max_value = *std::max_element(ALL(v));
-	P(max_value);
-	int i;
-	string s0("10");
-	TOI(s0, i); P(i);
+class HamiltonPath {
+int N, M;
 
-	double f;
-	string s1("10.232");
-	TOD(s1, f); P(f);
-	PF("%lf\n", f);
+	public:
+	int countPaths(vector<string> roads)
+	{
+		N = roads.size();
+		M = roads[0].size();
+		// P(N); P(M);
 
-	map<string, int> m;
-	m["hoge"] = 100;
-	m["hige"] = 200;
-	Map::find(m, string("hoge"));
+		REP(i, N) { REP(j, M) {
+			if(roads[i][j] == 'Y'){
+				t[i][j] = true;
+			}
+		}}
 
-	vector<pair<string, int> > p = Map::toList(m);
-	PL::show(p);
+		REP(i, N){ 
+			int cnt = 0;
+			REP(j, M) { 
+				if(t[i][j]){
+					if(++cnt > 2){
+						return 0;
+					}
+				}
+			}
+			// P(cnt);
+			connect[i] = cnt;
+		}
+		// REP(i, N) P(connect[i]);
 
-	stable_sort(ALL(p), PL::comp_by_value<string, int>);
-	PL::show(p);
+		REP(i, N){
+			P("---");
+			P(i)
+			P(connect[i]);
+			if(connect[i] == 0){
+				visited[i] = true;
+				nr_free++;
+			}else if(connect[i] == 1 && !visited[i]){
+				// P(i);
+				nr_grp++;
+				dfs(i);
+			}
+		}
+		P("***");
+		P(nr_grp);
+		P(nr_free);
 
-	vector<pair<int, string> > r = PL::flip(p);
-	PL::show(r);
-	PL::show(PL::flip(p));
+		long long sum = 1;
+		long long mod = 10000007;
 
-	REP(k, 3) P(k);
-	REP2(z, -1, 2) P(z);
-	
+		REP(i, N){ P(visited[i]); }
+		REP(i, N){
+			if(! visited[i]) {
+				P("not visited");
+				return 0;
+			}
+		}
+
+		REP(i, nr_grp + nr_free){
+			sum = sum * (i+1) % mod;
+		}
+
+		REP(i, nr_grp){
+			sum = sum * 2 % mod;
+		}
+
+		return (int) sum;
+	}
+
+	void dfs(int i){
+		P(i);
+		visited[i] = true;
+		REP(j, M){
+			if(t[i][j] && !visited[j]) dfs(j);
+		}
+	}
+};
+
+int main(void)
+{
+	HamiltonPath h = HamiltonPath();	
+	// mk_vector(r, string, "NYY", "YNY", "YYN");
+	mk_vector(r, string, "NNNNNY", "NNNNYN", "NNNNYN", "NNNNNN", "NYYNNN", "YNNNNN");
+	L::show(r);
+	P(h.countPaths(r));
+
 	return 0;
 }
